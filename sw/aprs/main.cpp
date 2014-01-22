@@ -46,7 +46,7 @@ unsigned int length = 0;
 
 uint8_t	aprs_destination[] = "APRS  0WIDE1 1WIDE2 1";
 uint8_t aprs_source[] = "OZ3RF 1";
-uint8_t aprs_string[] = "=5700.00N/01000.00W-Test 001252";
+uint8_t aprs_string[] = "=5700.00N/01000.00W-Test 001234";
 
 int afsktime;
 
