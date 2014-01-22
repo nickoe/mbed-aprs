@@ -59,34 +59,6 @@ void Sample_timer_interrupt(void)
 }
 
 int main() {
-	// Find lenght of data
-	int i = 0;
-	int size = 0;
-
-	ax25_pack(aprs_destination,
-		aprs_source,
-		aprs_string,
-		dataout,
-		size);
-	size=i+34; //34+31
-
-	// Duplicate start flag and append more end flags
-	for (i = 0; i < size ; i++ ) {
-		datain[i] = dataout[i];
-	}
-	bitstuff(datain+1,dataout+1,size-2);
-	dataout[64] = 0b10111111;
-	dataout[65] = 0b00111111;
-	for (i = 0; i < 70 ; i++ ) {
-		datain[i] = dataout[i];
-	}
-	for (i = 0; i < 70 ; i++ ) {
-		dataout[i+1] = datain[i];
-	}
-
-
-	nrzi_encode(dataout,nrzidata,size+5);
-
 	led1 = 1;
 	led2 = 0;
 	led3 = 0;
