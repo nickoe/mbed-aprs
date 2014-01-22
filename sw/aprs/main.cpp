@@ -28,7 +28,6 @@ int print = 0;
 
 AnalogOut DAC(p18);
 volatile int i=0;
-float Analog_out_data[128];
 float gain = 0.23;
 float freq = 1200;
 
@@ -78,11 +77,6 @@ int main() {
 	pc.printf("FOOOO %d\r\n",afsktime);
 	pc.printf("0x%X\r\n",(uint8_t)testing[0]);
 	pc.printf("0x%X\r\n",(uint8_t)testing[1]);
-
-	// This should probably be made to a pre computed table also
-	for(int k=0; k<32; k++) {                                               
-		Analog_out_data[k] = int (65535.0 * ((1.0 + sin((float(k)/32.0*6.28318530717959)))/2.0)) * gain;
-	}
 		
 	Sample_Period.attach(&Sample_timer_interrupt, 1.0/(freq*296));
 	while (1) {
