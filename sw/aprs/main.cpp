@@ -27,12 +27,9 @@ uint16_t adcvalue = 65535; // ADC is 12-bit
 int print = 0;
 
 AnalogOut DAC(p18);
-volatile int i=0;
+volatile int afskcnt=0;
 float gain = 0.23;
-float freq = 1200;
 
-
-uint8_t datain[1024];
 uint8_t dataout[1024]; // size allocation is just big "enough" for now
 uint8_t nrzidata[1024]; // size allocation is just big "enough" for now
 int16_t afsk[100];
@@ -47,16 +44,18 @@ int afsktime;
 
 void Sample_timer_interrupt(void)
 {
-	DAC.write_u16(afsk[i]+32768);
-	if (i >afsktime) {
+	DAC.write_u16(afsk[afskcnt]+32768);
+	if (afskcnt >(afsktime)) {
 		trigger = 1;
-		i = 0;
+		afskcnt = 0;
 		trigger = 0;
 	}
 	else
-		i++;
+		afskcnt++;
 }
 
+	uint8_t datain[3];
+	uint8_t testing[3];
 int main() {
 	led1 = 1;
 	led2 = 0;
@@ -67,23 +66,27 @@ int main() {
 	datain[0] = 0x00;
 	datain[1] = 0xff;
 
-	uint8_t testing[3] = {0x00,0xff,0x00};
+	testing[0] = 0x00;
+	testing[1] = 0xff;
+	testing[2] = 0x00;
 
 	pc.printf("0x%X\r\n",(uint8_t)testing[0]);
 	pc.printf("0x%X\r\n",(uint8_t)testing[1]);
-	afsktime = mod_afsk(&testing[0],afsk,2);
-//afsktime = mod_afsk(&datain[0],afsk,2);
+//	afsktime = mod_afsk(&testing[0],afsk,2);
+//	afsktime = mod_afsk(testing,afsk,2);
+//	afsktime = mod_afsk(&datain[0],afsk,2);
+	afsktime = mod_afsk(datain,afsk,2);
 
 	pc.printf("FOOOO %d\r\n",afsktime);
 	pc.printf("0x%X\r\n",(uint8_t)testing[0]);
 	pc.printf("0x%X\r\n",(uint8_t)testing[1]);
 		
-	Sample_Period.attach(&Sample_timer_interrupt, 1.0/(freq*296));
+	Sample_Period.attach(&Sample_timer_interrupt, 1.0/(44100*1.83));
 	while (1) {
 		led4=1;
-		wait(0.5);
+		wait(0.2);
 		led4=0;
-		wait(0.5);
+		wait(0.2);
 	}
 }
 
