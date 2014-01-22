@@ -30,7 +30,7 @@ AnalogOut DAC(p18);
 volatile int i=0;
 float Analog_out_data[128];
 float gain = 0.23;
-float	freq = 1200;
+float freq = 1200;
 
 
 uint8_t datain[1024];
@@ -40,7 +40,7 @@ int16_t afsk[100];
 
 unsigned int length = 0;
 
-uint8_t	aprs_destination[] = "APRS  0WIDE1 1WIDE2 1";
+uint8_t aprs_destination[] = "APRS  0WIDE1 1WIDE2 1";
 uint8_t aprs_source[] = "OZ3RF 1";
 uint8_t aprs_string[] = "=5700.00N/01000.00W-Test 001234";
 
@@ -82,7 +82,7 @@ int main() {
 	// This should probably be made to a pre computed table also
 	for(int k=0; k<32; k++) {                                               
 		Analog_out_data[k] = int (65535.0 * ((1.0 + sin((float(k)/32.0*6.28318530717959)))/2.0)) * gain;
-    }
+	}
 		
 	Sample_Period.attach(&Sample_timer_interrupt, 1.0/(freq*296));
   while (1) {
