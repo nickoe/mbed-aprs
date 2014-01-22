@@ -24,11 +24,12 @@ int print = 0;
 AnalogOut DAC(p18);
 volatile int afskcnt=0;
 
-uint8_t datain[3];
-uint8_t testing[3];
 
 int afsktime;
-int16_t afsk[1000];
+int16_t afsk[1000]; // <-- THIS ARRAY WAS TOO SMALL THAT WAS THE PROBLEM
+
+uint8_t datain[3];
+uint8_t testing[3];
 
 void Sample_timer_interrupt(void)
 {
