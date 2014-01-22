@@ -184,8 +184,8 @@ uint8_t testing[3] = {0x00,0xff,0x00};
 
 pc.printf("0x%X\r\n",(uint8_t)testing[0]);
 pc.printf("0x%X\r\n",(uint8_t)testing[1]);
-//afsktime = mod_afsk(&testing[0],afsk,2);
-afsktime = mod_afsk(&datain[0],afsk,2);
+afsktime = mod_afsk(&testing[0],afsk,2);
+//afsktime = mod_afsk(&datain[0],afsk,2);
 
 pc.printf("FOOOO %d\r\n",afsktime);
 pc.printf("0x%X\r\n",(uint8_t)testing[0]);
@@ -202,7 +202,7 @@ pc.printf("0x%X\r\n",(uint8_t)testing[1]);
 		
 	ticker.attach_us(sample, interval_us);
 //	twoTone.attach_us(set_freq, 500000);
-    while (1) {
+  while (1) {
 		if (print == 1) {
 			adcvalue = adcin.read_u16();
 			pc.printf("%u",adcvalue);
@@ -217,13 +217,16 @@ pc.printf("0x%X\r\n",(uint8_t)testing[1]);
 				gonote = 1;
 			}
 		}
-		wait(1.002);
+		led4=1;
+		wait(0.5);
+		led4=0;
+		wait(0.5);
 		if (gonote ==1) {
 			Sample_Period.attach(&Sample_timer_interrupt, 1.0/(freq*296));
 		} else {
 			DAC.write_u16(0); // Not to load the transistor with DC
 			Sample_Period.detach();
 		}
-    }
+  }
 }
 

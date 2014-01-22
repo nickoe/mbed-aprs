@@ -18,6 +18,7 @@ void print_binary(uint8_t data[], int size) {
 	}
 }
 
+
 const unsigned char flip_table[256] = {	
   0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0, 
   0x10, 0x90, 0x50, 0xd0, 0x30, 0xb0, 0x70, 0xf0, 
@@ -58,6 +59,7 @@ unsigned char byte_flip(unsigned char a) {
 	return flip_table[a];
 }
 
+
 unsigned char ascii7(unsigned char a) {
 //  unsigned char tmp,i;
 //  if (65 <= a <= 90) { // A-Z
@@ -67,6 +69,7 @@ unsigned char ascii7(unsigned char a) {
     return a;
   }
 }
+
 
 void ax25_pack( uint8_t destination[], uint8_t  source[], uint8_t aprs_data[],
 							  uint8_t dataout[], int size ) {
@@ -109,7 +112,6 @@ void ax25_pack( uint8_t destination[], uint8_t  source[], uint8_t aprs_data[],
 	// APRS data
 	memcpy(dataout +31,aprs_data,msg_size);
 
-
 	// Calculate FCS (CRC)
 	uint16_t crc;
 	crc = calc_crc_ccitt(&dataout[1],61);
@@ -123,31 +125,10 @@ void ax25_pack( uint8_t destination[], uint8_t  source[], uint8_t aprs_data[],
 		dataout[i] = (uint8_t)byte_flip((unsigned char)dataout[i]);
 	}
 ///	printf("0x%x\n",calc_crc_ccitt(dataout+1,61));
+
 	// Flag
 	dataout[33+msg_size] = 0x7e;
-
-
-	//bitstuff(dataout+1,dataiout+1,31+msg_size);
-	//bitstuff(dataout,dataout,33+msg_size);
-
-/*
-	//uint8_t testarray[3] = {0b10111111, 0b10100000, 0b00000000};
-	uint8_t testarray[3] = {0b10111111, 0b10100010, 0b11011011};
-//	uint8_t testarray[3] = {0b11111100, 0b10100010, 0b11011011};
-//	uint8_t testarray[3] = {0xff, 0xff, 0xff};
-	uint8_t testarray2[6] = {};
-	print_binary(testarray,3);
-	printf("\n");
-	bitstuff(testarray,testarray2,3);
-	printf("\n");
-	print_binary(testarray2,6);
-	printf("\n");
-	printf("       ^\n");
-	printf("       0 \n");
-*/
 }
-
-
 
 
 void bitstuff( uint8_t input[], uint8_t  output[], int size ) {
@@ -217,20 +198,21 @@ void nrzi_encode( uint8_t input[], uint8_t  output[], int size ) {
 	}
 }
 
-int mod_afsk( uint8_t input[], int16_t  output[], int size ) {
 
-//	int16_t tones = 0; // Output signal (should be output[] in th end)
+int mod_afsk( uint8_t input[], int16_t  output[], int size ) {
 	uint16_t tabpos = 0; // Position in table
 	int8_t sgn = 1; // Sign
 	uint16_t time = 0; // Time
 	int kk,b,nn;
 	uint8_t bit;
+	uint8_t debug_byte;
 
 ///	printf("DELTA0:\t %d\n",DELTA0);
 ///	printf("DELTA1:\t %d\n",DELTA1);
 ///	printf("SPS:\t %d\n",SPS);
 
 	for (kk = 0;kk<size;kk++) {
+		debug_byte = input[kk];
 		for(b=7;b+1>0;b--){                                                         
 		// Read current bit
 		bit = ((input[kk] >> (b)) & 0x01);  
@@ -260,11 +242,9 @@ int mod_afsk( uint8_t input[], int16_t  output[], int size ) {
 //		printf("\n");
 	}
 	
-
-	return time;
-
-	
+	return time;	
 }
+
 
 /*
 const int NUM_SAMPLES = (WAVFILE_SAMPLES_PER_SECOND*2);
@@ -294,6 +274,8 @@ void wav_write( uint8_t input[], uint8_t  output[] ) {
 	//return 0;
 }
 */
+
+
 void aprs_send( uint8_t input[], uint8_t  output[] ) {
 
 }

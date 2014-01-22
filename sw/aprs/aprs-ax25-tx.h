@@ -1,6 +1,9 @@
 #ifndef	APRS_AX25_TH_H 
 #define	APRS_AX25_TX_H 
 
+/*
+ * Defines specifying the properties of the AFSK format
+ */
 #define BAUD 1200
 #define SPACE 1200
 #define MARK 2200
@@ -11,9 +14,22 @@
 #define DELTA1 (int) round(2*LOOKUP_SIZE*MARK/SAMP_FREQ)
 #define SPS (int) round(SAMP_FREQ/BAUD) // Samples per symbol
 
+/*
+ * Just a function that prints ones and zeroes in the bytes it
+ * recieves with ptintf()
+ */
 void print_binary(uint8_t data[], int size);
+
+/*
+ * Packs a AX.25 packet by getting the AX.25 frame addresses and APRS
+ * formatted data section
+ */
 void ax25_pack( uint8_t destination[], uint8_t  source[], uint8_t aprs_data[],
                 uint8_t dataout[], int size );
+
+/*
+ * Flip the MSB first to LSB first alignment for a byte
+ */
 unsigned char byte_flip(unsigned char a);
 
 /* Callsigns are 7 bit standard ASCII (Caps only), and is put in the MSB part of the
@@ -33,12 +49,25 @@ void bitstuff( uint8_t input[], uint8_t  output[], int size );
  * NRZI (Non-return-to-zero inverted) encoding
  */
 void nrzi_encode( uint8_t input[], uint8_t  output[], int size );
+
+/*
+ * AFSK modulate the bitstuffed and NRZI encoded data. It might be
+ * wise for this function to also return the current state tabpos
+ * variable, so one can start it where it ended last time. This is
+ * usefull to output partial packets.
+ */
 int mod_afsk( uint8_t input[], int16_t  output[], int size );
+
+/*
+ * This function is used to output the signal in a wav file when on
+ * workstation, instead of the analog output on the microcontroller.
+ */
 //void wav_write( uint8_t input[], uint8_t  output[] );
 
-
+/*
+ * Not implemented yet, was supposed to be an interface to construft
+ * packets easily
+ */
 void aprs_send( uint8_t input[], uint8_t  output[] );
-
-
  
 #endif 
