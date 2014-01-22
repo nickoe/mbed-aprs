@@ -85,11 +85,11 @@ int main() {
 	}
 		
 	Sample_Period.attach(&Sample_timer_interrupt, 1.0/(freq*296));
-  while (1) {
+	while (1) {
 		led4=1;
 		wait(0.5);
 		led4=0;
 		wait(0.5);
-  }
+	}
 }
 
