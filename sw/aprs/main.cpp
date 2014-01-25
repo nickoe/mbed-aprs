@@ -26,17 +26,19 @@ uint16_t adcvalue = 65535; // ADC is 12-bit
 
 Ticker Sample_Period;
 volatile int afskcnt=0;
+volatile int afsktime=0;
+int tabpos=0;
 
 uint8_t datain[300];
 uint8_t dataout[300]; // size allocation is just big "enough" for now
 uint8_t nrzidata[300]; // size allocation is just big "enough" for now
-int16_t afsk[1000];
+#define AFSKSIZE 37*8
+int16_t afsk[2*AFSKSIZE]; // One bit is one symbol, hence one byte takes SPS*8
 
 uint8_t	aprs_destination[] = "APRS  0WIDE1 1WIDE2 1";
 uint8_t aprs_source[] = "OZ3RF 1";
 uint8_t aprs_string[] = "=5700.00N/01000.00W-Test 001252";
 
-int afsktime;
 
 void Sample_timer_interrupt(void)
 {
@@ -53,6 +55,12 @@ void Sample_timer_interrupt(void)
 
 
 int main() {
+	pc.baud(115200);
+	const char buildtime[] =  __DATE__ " " __TIME__;
+	const char gitcommit[sizeof(__GIT_COMMIT__)] = __GIT_COMMIT__;
+	printf("\r\nAPRS tracker by OZ3RF\r\n");
+	printf("%s\r\n%s\r\n", buildtime, gitcommit);
+
 	int i=0;
 	int size=0;
 	while( aprs_string[i] != 0)
@@ -86,17 +94,21 @@ int main() {
 	nrzi_encode(dataout,nrzidata,size+5);
 
 //afsktime = mod_afsk(nrzidata,afsk,size+2);
-	afsktime = mod_afsk(nrzidata,afsk,1);
+///	pc.printf("\n\n\n\n\nafsktime: %d\r\nSPS: %d\r\n", afsktime,SPS);
+	
+	// Loop through every byte in our packet
+	for (uint16_t j=0; j<(size+2); j++) {
+		afsktime = mod_afsk(nrzidata,afsk,&tabpos,1);
+	}
 
-	pc.baud(115200);
 
 //	datain[0] = 0x00;
 //	datain[1] = 0xff;
 
 //	afsktime = mod_afsk(datain,afsk,2);
-	pc.printf("\n\n\n\n\nafsktime: %d\r\nSPS: %d\r\n", afsktime,SPS);
+///	pc.printf("\n\n\n\n\nafsktime: %d\r\nSPS: %d\r\n", afsktime,SPS);
 
-	Sample_Period.attach(&Sample_timer_interrupt, 1.0/(44100*1.83));
+	Sample_Period.attach(&Sample_timer_interrupt, 1.0/(44100));
 	while (1) {
 		led1 = 1;
 		wait(0.05);

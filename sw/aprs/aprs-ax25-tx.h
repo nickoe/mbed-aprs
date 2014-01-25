@@ -56,7 +56,7 @@ void nrzi_encode( uint8_t input[], uint8_t  output[], int size );
  * variable, so one can start it where it ended last time. This is
  * usefull to output partial packets.
  */
-int mod_afsk( uint8_t input[], int16_t  output[], int size );
+int mod_afsk( uint8_t input[], int16_t  output[], int *tabpos, int size );
 
 /*
  * This function is used to output the signal in a wav file when on
