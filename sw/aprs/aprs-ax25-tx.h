@@ -8,11 +8,12 @@
 #define SPACE 1200
 #define MARK 2200
 #define LOOKUP_SIZE 1024
-#define SAMP_FREQ (double) 44100
+#define SAMP_FREQ 44100
 #define AMPLITUDE 0.5
 #define DELTA0 (int) round(2*LOOKUP_SIZE*SPACE/SAMP_FREQ)
 #define DELTA1 (int) round(2*LOOKUP_SIZE*MARK/SAMP_FREQ)
-#define SPS (int) round(SAMP_FREQ/BAUD) // Samples per symbol
+#define SPS (SAMP_FREQ/BAUD) // Samples per symbol
+#define AFSKSIZE ((SPS+1)*8) // The +1 is just to conform with MATLAB for the moment
 
 /*
  * Just a function that prints ones and zeroes in the bytes it

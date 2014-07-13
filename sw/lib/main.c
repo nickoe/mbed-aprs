@@ -12,7 +12,7 @@ uint8_t datain[1024];
 uint8_t dataout[1024]; // size allocation is just big "enough" for now
 uint8_t nrzidata[1024]; // size allocation is just big "enough" for now
 int16_t afsk[100000];
-
+volatile int  afsktime=0;
 unsigned int length = 0;
 
 uint8_t	aprs_destination[] = "APRS  0WIDE1 1WIDE2 1";
@@ -98,8 +98,14 @@ void main( void ) {
 
 //	time = mod_afsk(nrzidata,afsk,38+31);
 //	wavfile_write(f,afsk,time);
-	time = mod_afsk(nrzidata,afsk,size+2);
-	wavfile_write(f,afsk,time);
+	//time = mod_afsk(nrzidata,afsk,size+2);
+
+
+	for (uint16_t j=0; j<(size+2); j++) {
+		afsktime = mod_afsk(nrzidata,afsk,&time,1);
+	  wavfile_write(f,afsk,afsktime);
+	}
+
 //	foo[0] = 0b01111110;
 //	time = mod_afsk(foo,afsk,1);
 //	wavfile_write(f,afsk,time-3);

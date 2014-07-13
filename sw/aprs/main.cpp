@@ -32,17 +32,38 @@ int tabpos=0;
 uint8_t datain[300];
 uint8_t dataout[300]; // size allocation is just big "enough" for now
 uint8_t nrzidata[300]; // size allocation is just big "enough" for now
-#define AFSKSIZE 37*8
-int16_t afsk[2*AFSKSIZE]; // One bit is one symbol, hence one byte takes SPS*8
-
-uint8_t	aprs_destination[] = "APRS  0WIDE1 1WIDE2 1";
+uint8_t aprs_destination[] = "APRS  0WIDE1 1WIDE2 1";
 uint8_t aprs_source[] = "OZ3RF 1";
 uint8_t aprs_string[] = "=5700.00N/01000.00W-Test 001252";
+
+typedef struct {
+	int16_t data[AFSKSIZE*2]; // One bit is one symbol, hence one byte takes SPS*8
+	uint16_t size;
+	uint16_t head; // Put to here
+	uint16_t tail; // Get from here
+} audiobuf_t;
+
+audiobuf_t afsk;
+
+int ringbuffer_write(audiobuf_t * buf_ptr, int16_t data[], int size) {
+	int tmp=0;
+	tmp = buf_ptr->head;
+	for (int i=0; i < size; i++) {
+		buf_ptr->data[tmp+i] = data[i];
+	}
+	buf_ptr->head = tmp+size;
+	return 0;
+}
+
+int ringbuffer_read(audiobuf_t * buf_ptr, int size) {
+	return 0;
+}
+
 
 
 void Sample_timer_interrupt(void)
 {
-	DAC.write_u16(afsk[afskcnt]+32768);
+	DAC.write_u16(afsk.data[afskcnt]+32768);
 	if (afskcnt >afsktime) {
 		trigger = 1;
 		afskcnt = 0;
@@ -60,7 +81,7 @@ int main() {
 	const char gitcommit[sizeof(__GIT_COMMIT__)] = __GIT_COMMIT__;
 	printf("\r\nAPRS tracker by OZ3RF\r\n");
 	printf("%s\r\n%s\r\n", buildtime, gitcommit);
-
+	pc.printf("%d", AFSKSIZE);
 	int i=0;
 	int size=0;
 	while( aprs_string[i] != 0)
@@ -96,23 +117,32 @@ int main() {
 //afsktime = mod_afsk(nrzidata,afsk,size+2);
 ///	pc.printf("\n\n\n\n\nafsktime: %d\r\nSPS: %d\r\n", afsktime,SPS);
 	
-	// Loop through every byte in our packet
-	for (uint16_t j=0; j<(size+2); j++) {
-		afsktime = mod_afsk(nrzidata,afsk,&tabpos,1);
-	}
 
 
-//	datain[0] = 0x00;
-//	datain[1] = 0xff;
+	datain[0] = 0x00;
+	datain[1] = 0xff;
 
 //	afsktime = mod_afsk(datain,afsk,2);
-///	pc.printf("\n\n\n\n\nafsktime: %d\r\nSPS: %d\r\n", afsktime,SPS);
+	pc.printf("\n\n\n\n\nafsktime: %d\r\nSPS: %d\r\n", afsktime,SPS);
+
+	int ready=0; // Set to true when we want to send a packet
+
 
 	Sample_Period.attach(&Sample_timer_interrupt, 1.0/(44100));
 	while (1) {
+
+	// Loop through every byte in our packet
+	size =1 ;
+	uint16_t j = 0;
+	for (j=0; j<(size+2); j++) {
+		afsktime = mod_afsk(nrzidata,afsk.data,&tabpos,1);
+	}
+	pc.printf("%d\r\n", j);
+
 		led1 = 1;
-		wait(0.05);
+		wait(1.15);
 		led1 = 0;
+/*
 		led2 = 1;
 		wait(0.05);
 		led2 = 0;
@@ -128,6 +158,7 @@ int main() {
 		led2 = 1;
 		wait(0.05);
 		led2 = 0;
+	*/	
 	}
 }
 

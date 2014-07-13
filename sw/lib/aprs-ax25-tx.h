@@ -1,4 +1,4 @@
-#ifndef	APRS_AX25_TH_H 
+#ifndef	APRS_AX25_TX_H 
 #define	APRS_AX25_TX_H 
 
 #define BAUD 1200
@@ -33,7 +33,7 @@ void bitstuff( uint8_t input[], uint8_t  output[], int size );
  * NRZI (Non-return-to-zero inverted) encoding
  */
 void nrzi_encode( uint8_t input[], uint8_t  output[], int size );
-int mod_afsk( uint8_t input[], int16_t  output[], int size );
+int mod_afsk( uint8_t input[], int16_t  output[], int *tabpos, int size );
 void wav_write( uint8_t input[], uint8_t  output[] );
 
 

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 #include <math.h>
 #include "aprs-ax25-tx.h"
 #include "crc-ccitt.h"
@@ -215,18 +216,24 @@ void nrzi_encode( uint8_t input[], uint8_t  output[], int size ) {
 	}
 }
 
-int mod_afsk( uint8_t input[], int16_t  output[], int size ) {
+int mod_afsk( uint8_t input[], int16_t  output[], int *tabpos, int size ) {
 
 	int16_t tones = 0; // Output signal (should be output[] in th end)
-	uint16_t tabpos = 0; // Position in table
+//	uint16_t tabpos = 0; // Position in table
 	int8_t sgn = 1; // Sign
 	uint16_t time = 0; // Time
 	int kk,b,nn;
 	uint8_t bit;
 
-	printf("DELTA0:\t %d\n",DELTA0);
-	printf("DELTA1:\t %d\n",DELTA1);
-	printf("SPS:\t %d\n",SPS);
+//	printf("DELTA0:\t %d\n",DELTA0);
+//	printf("DELTA1:\t %d\n",DELTA1);
+//	printf("SPS:\t %d\n",SPS);
+
+	printf("input to mod_afsk(): %d\n", *tabpos);
+if (*tabpos<0){         
+	sgn = -1;            
+	*tabpos = (*tabpos)*(-1);
+}                      
 
 	for (kk = 0;kk<size;kk++) {
 		for(b=7;b+1>0;b--){                                                         
@@ -235,33 +242,40 @@ int mod_afsk( uint8_t input[], int16_t  output[], int size ) {
 //		printf("%d",bit);
 			if (bit==1) {
 				for (nn=0;nn<SPS;nn++){
-					if (tabpos >= LOOKUP_SIZE) {
-						tabpos = tabpos - LOOKUP_SIZE;
+					if (*tabpos >= LOOKUP_SIZE) {
+						*tabpos = *tabpos - LOOKUP_SIZE;
 						sgn = sgn*(-1);
 					}
-					output[time] = AMPLITUDE*table[tabpos]*sgn;
+					output[time] = AMPLITUDE*table[*tabpos]*sgn;
 					time++;
-					tabpos += DELTA1;
+					*tabpos += DELTA1;
 				}
 			} else {
 				for (nn=0;nn<SPS;nn++){
-					if (tabpos >= LOOKUP_SIZE) {
-						tabpos = tabpos - LOOKUP_SIZE;
+					if (*tabpos >= LOOKUP_SIZE) {
+						*tabpos = *tabpos - LOOKUP_SIZE;
 						sgn = sgn*(-1);
 					}
-					output[time] = AMPLITUDE*table[tabpos]*sgn;
+					output[time] = AMPLITUDE*table[*tabpos]*sgn;
 					time++;
-					tabpos += DELTA0;
+					*tabpos += DELTA0;
 				}
 			}
 		}
 //		printf("\n");
 	}
 	
+if (sgn<0)              
+	*tabpos =  (*tabpos*(-1)); 
+else if (sgn>0)         
+	*tabpos =  *tabpos;        
+
+	printf("Output: %d\n", *tabpos);
 
 	return time;
 
-	
+                        
+
 }
 
 

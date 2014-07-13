@@ -201,7 +201,6 @@ void nrzi_encode( uint8_t input[], uint8_t  output[], int size ) {
 
 int mod_afsk( uint8_t input[], int16_t  output[], int *tabpos, int size ) {
 
-	int16_t tones = 0; // Output signal (should be output[] in th end)
 //	uint16_t tabpos = 0; // Position in table
 	int8_t sgn = 1; // Sign
 	uint16_t time = 0; // Time
